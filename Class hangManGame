@@ -94,18 +94,21 @@ public class HangManGame {
 		int index = word.indexOf(letter);
 		HashSet<Character> lettersIN = new HashSet<Character>();
 		lettersIN.add(letter);
-		while (index >= 0) {
 			if (lettersIN.contains(letter))
 			{
-				System.out.print("This letter was already entered, please try again");
+				System.out.print("The letter "+letter+" was already entered, please try again");
 			}
 			else
 			{
+				while (index >= 0) {
 				enteredLetters[index]=letter;
 				System.out.println(index);
 				index = word.indexOf(letter, index + 1);
 				tries++;
 			}
+				if (index==(-1)){
+					System.out.println("The letter "+letter+" is not in the word");
+				}
 		}
 		return tries;
 	}
@@ -118,6 +121,20 @@ public class HangManGame {
 			}
 		}
 		return true;
+	}
+	private static int calculateScore(int tries, String word) {
+		return (((word.length())/tries)*10);
+	}
+	
+	private static int calculateMissed(String word,char[] enteredLetters) {
+		int index=0;
+		int missed=0;
+		while (index >= 0) {
+			enteredLetters[index]='*';
+			index = word.indexOf('*', index + 1);
+			missed--;
+		}
+		return missed;
 	}
 
 	public static void main(String[] args) {
@@ -140,18 +157,18 @@ public class HangManGame {
 		}
 		printArray(enteredLetters); //print hidden word.
 		Scanner stdIn = new Scanner(System.in);
-		boolean flag=false; //flag to check if word was fully guessed.
+		boolean wordIsGuessed=false;
 		for (int i=0; i<((word.length())*2); i++) //loop will run double the amount of letters in words.
 		{
-			while (flag==false)
+			while (wordIsGuessed==false)
 			{
 
 				char letter= (stdIn.next()).charAt(0); //get entered letter
 				if (Character.isLetter(letter)) //check if letter char.
 				{
 					//System.out.print(letter);
-					flag=checkWord(enteredLetters); //check if letter in the word. flag will turn true if all letters in words will get guessed.
-					if (flag==true){
+					wordIsGuessed=checkWord(enteredLetters); //check if letter in the word. flag will turn true if all letters in words will get guessed.
+					if (wordIsGuessed==true){
 						break;
 					}
 					tries=findLetter(word,letter,enteredLetters); //look for index of letter in word. if exist then added to array. counts the tries.
@@ -163,15 +180,15 @@ public class HangManGame {
 				}
 			}
 		}
-		if (flag=true){
+		if (wordIsGuessed=true){
 			g.setScore(calculateScore(tries, word));
-			System.out.print("Congragulations! You have guessed the word: "+word+" in "+tries+" tries.\n Your score is: "+score);
+			System.out.print("Congragulations! You have guessed the word: "+word+" in "+tries+" tries.\n Your score is: "+g.getScore());
 		}
 		else{
-			g.setScore(0);
+			int missed=calculateMissed(word, enteredLetters);
+			g.setScore(tries+missed);
+			System.out.print("Sorry! not this time. The word was "+word+"and you had "+missed+ "misses. Your score is "+g.getScore());
 		}
-			
-		
 		g.setTries(tries);
 		stdIn.close();
 	}
