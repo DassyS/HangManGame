@@ -18,9 +18,6 @@ public class Player {
 		games.add(game);
 	}
 
-	public HangManGame GamesForPlayer() { //work on it...
-		return gameID;
-	}
 	public String getEmail() {
 		return emailAddress;
 	}
